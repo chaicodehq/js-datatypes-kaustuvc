@@ -41,5 +41,50 @@
  *   // => { name: "Priya", totalMarks: 63, percentage: 31.5, grade: "F", ... }
  */
 export function generateReportCard(student) {
-  // Your code here
+  if (typeof student === "object" && student !== null && typeof student.name === "string" && student.name.length > 0 && typeof student.marks === "object" && Object.keys(student.marks).length > 0) {
+    for (const marks of Object.values(student.marks)) {
+      if (!(typeof marks === "number" && marks >= 0 && marks <= 100))
+        return null
+    }
+    
+    const name = student.name
+    const totalMarks = Object.values(student.marks).reduce((sum, curr) => sum + curr, 0)
+    const subjectCount = Object.keys(student.marks).length
+    const percentage = parseFloat(((totalMarks / (subjectCount * 100)) * 100).toFixed(2))
+    let grade = ""
+    
+    if (percentage >= 90)
+      grade = "A+"
+    else if (percentage >= 80)
+      grade = "A"
+    else if (percentage >= 70)
+      grade = "B"
+    else if (percentage >= 60)
+      grade = "C"
+    else if (percentage >= 40)
+      grade = "D"
+    else
+      grade = "F"
+    
+    let highestSubject = Object.keys(student.marks)[0]
+    let lowestSubject = Object.keys(student.marks)[0]
+    let max = 0
+    let min = 100
+    for (const [key, value] of Object.entries(student.marks)) {
+      if (max < value) {
+        max = value
+        highestSubject = key
+       }
+      if (min > value) {
+        min = value
+        lowestSubject = key
+       }
+    }
+    
+    const passedSubjects = (Object.entries(student.marks).filter(([subject, marks]) => marks >= 40)).map(arr => arr[0])
+    const failedSubjects = (Object.entries(student.marks).filter(([subject, marks]) => marks < 40)).map(arr => arr[0])
+    
+    return {name, totalMarks, percentage, grade, highestSubject, lowestSubject, passedSubjects, failedSubjects, subjectCount}
+  } else
+    return null
 }
