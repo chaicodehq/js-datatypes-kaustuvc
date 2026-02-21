@@ -47,5 +47,54 @@
  *   //      frequentContact: "Swiggy", allAbove100: false, hasLargeTransaction: true }
  */
 export function analyzeUPITransactions(transactions) {
-  // Your code here
+  if (Array.isArray(transactions) && transactions.length > 0) {
+    const type = ["credit", "debit"]
+    const validTransactions = transactions.filter(obj => {
+      if (obj.amount >= 0 && type.includes(obj.type))
+        return obj
+    })
+    if (validTransactions.length === 0)
+      return null
+    
+    const totalAmount = validTransactions.reduce((sum, obj) => sum + obj.amount, 0)
+    const totalCredit = validTransactions.reduce((sum, obj) => {
+      if (obj.type === "credit")
+        return sum + obj.amount
+      return sum
+    }, 0)
+    const totalDebit = totalAmount - totalCredit
+    const netBalance = totalCredit - totalDebit
+    
+    const transactionCount = validTransactions.length
+    const avgTransaction = Math.round(totalAmount / transactionCount)
+    const highestTransaction = validTransactions.reduce((max, obj) => {
+      if (max.amount < obj.amount)
+        return obj
+      return max
+    }, validTransactions[0])
+    
+    const categoryBreakdown = {}
+    validTransactions.forEach((obj) => {
+      categoryBreakdown[obj.category] = (categoryBreakdown[obj.category] || 0) + obj.amount
+    })
+    
+    const allField = {}
+    validTransactions.forEach((obj) => {
+      allField[obj.to] = (allField[obj.to] || 0) + 1
+    })
+    let frequentContact = ""
+    let max = 0
+    for (const key of Object.keys(allField)) {
+      if (max < allField[key]) {
+        max = allField[key]
+        frequentContact = key
+      }
+    }
+    
+    const allAbove100 = Object.values(validTransactions).every(obj => obj.amount > 100)
+    const hasLargeTransaction = Object.values(validTransactions).some(obj => obj.amount >= 5000)
+    
+    return {totalCredit, totalDebit, netBalance, transactionCount, avgTransaction, highestTransaction, categoryBreakdown, frequentContact, allAbove100, hasLargeTransaction}
+  } else
+    return null
 }
