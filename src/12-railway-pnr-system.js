@@ -115,5 +115,5 @@ export function processRailwayPNR(pnrData) {
   const nonCancelled = passengers.filter(p => p.statusLabel !== "CANCELLED");
   const chartPrepared = nonCancelled.every(p => p.isConfirmed);
 
-  return { pnrFormatted, trainInfo, passengers, summary, chartPrepared };
+  return { pnrFormatted, trainInfo, passengers, summary, chartPrepared }
 }
